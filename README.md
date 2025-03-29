@@ -1,11 +1,11 @@
 # Description 
----
+
 This project demonstrates a reverse engineering process of a TP-Link router (model: TL-MR3020 v1) with the scope to find the vulnerabilities of an IoT device and to understand the components of an embedded Linux system. It includes identifying the components, accessing UART console,  boot log analysis, firmware extraction, getting the root file system and root access, and further firmware analysis. 
 
 ![TL-MR3020 side-1](./images/TL-MR3020%20side-1.png)
 
 # Information Gathering
----
+
 The information gathering process is based on three steps:
 
 - **Searching information**, using the device name and manufacturer as search string.
@@ -13,7 +13,7 @@ The information gathering process is based on three steps:
 - **Getting the firmware** from the vendor web site or from the device flash memory.
 
 ## Searching information
----
+
 Interesting Hardware Specifications: 
 * **Device Model:** [TL-MR3020 V1](https://www.tp-link.com/us/support/download/tl-mr3020) 
 * **CPU:** [Atheros AR9331](https://www.openhacks.com/uploadsproductos/ar9331_datasheet.pdf), MIPS 24K processor can run up to 400 MHz
@@ -21,7 +21,6 @@ Interesting Hardware Specifications:
 * **Flash memory:** 4MB, device: Winbond W9425G6JH
 
 ## Inspecting the device
----
 
 | ![TL-MR3020 top](./images/TL-MR3020%20top.png)         | ![TL-MR3020 bottom](./images/TL-MR3020%20bottom.png)     |
 | ------------------------------------------------------ | -------------------------------------------------------- |
@@ -29,7 +28,7 @@ Interesting Hardware Specifications:
 | ![TL-MR3020 pcb top](./images/TL-MR3020%20pcb-top.png) | ![TL-MR3020 pcb bottom](./images/TL-MR3020%20bottom.png) |
 
 ### Opening the case
----
+
 [This guide from OpenWrt website](https://openwrt.org/toh/tp-link/tl-mr3020) provided a more detailed instructions on how to open the case and better internal images than mine. In my case, a set of small and thin chisel tools like below is used to slowly lift the lid starting right above the ethernet port where the case is not glued.  
 **!!! Be careful not to scratch the PCB traces and ports. 
 (just because I also scratched the USB and Ethernet ports)**
@@ -37,7 +36,7 @@ Interesting Hardware Specifications:
 ![TL-MR3020 uncovered](./images/TL-MR3020%20uncovered.png)
 
 ### Finding UART Interface
----
+
 UART (Universal Asynchronous Receiver/Transmitter), is a serial communication protocol used for transmitting data between two devices. It is very common in embedded devices and only uses two wires (TX and RX) with common a ground between transmitter and receiver to transmit and receive in both directions.
 
 Obviously, from the board top view, we can spot the 4 pin connector, with pin 1 (P1) at top which can be the candidate for the UART interface. To find out which pins are TX, RX, GND and VCC, a multi-meter is used and took the following measurements.  
@@ -68,7 +67,7 @@ UART interface allows us to:
 - Obtain a shell for device login
 
 ## Accessing UART console
----
+
 To access UART console, we connect it to a PC with USB to TTL/Serial Adapter. ([CP2102](https://www.waveshare.com/cp2102-usb-uart-board-type-a.htm) is used)
 
 - UART pin 1 (P1) TX  to TTL Adapter RX pin
@@ -91,7 +90,7 @@ sudo dmesg | tail
 ```
 
 ## Boot Log Analysis
----
+
 We can get a lot of useful information when the device is booting. With `--logfile` option of `picocom`, we can record all the inputs and outputs of serial console in a text file.
 
 ```
@@ -156,7 +155,7 @@ TL-MR3020 login:
 ```
 
 ## Accessing U-Boot CLI
----
+
 Before loading the kernel, we can access to the U-Boot CLI by entering specific keywords.
 By searching on the internet, found out that sending "tpl" during auto boot delay can get access to the U-Boot commands.
 
@@ -211,11 +210,11 @@ Environment size: 362/65532 bytes
 In the next step, we will test some U-Boot commands and try to extract the firmware out of the memory.
 
 ## Extracting the Firmware
----
+
 One way to extract the firmware and retrieve the root filesystem is through memory dumping. Alternatively, if available, the firmware can be downloaded directly from the vendor's website. 
 
 ### Method-1: Memory dumping 
----
+
 With the list of available U-Boot commands, it is not possible to access the contents of the Flash memory. However, using [`md`](https://docs.u-boot.org/en/latest/usage/cmd/md.html) command, we can display the contents on **DRAM**. 
 
 From the above boot info, kernel image is booted at the address `0x9f020000`. Since a SquashFS root filesystem is used, it is also possible for the root filesystem to be loaded into **DRAM**.
@@ -266,7 +265,7 @@ binwalk dump.bin
 Apparently, the binary file contains a kernel image and a squashfs root filesystem compressed in LZMA format.
 
 ### Method-2: Downloading the Firmware
----
+
 Since TP-Link provided with [firmware updates](https://www.tp-link.com/us/support/download/tl-mr3020/#Firmware) on the website, we can easily download the file and analyze it using `binwalk`. 
 
 ```
@@ -279,7 +278,7 @@ Using `binwalk`, we can understand that:
 * The firmware uses LZMA compression.
 
 ## Getting the Root Filesystem
----
+
 To obtain the root filesystem, we can extract it from either the *dumped binary file* or the *downloaded firmware file*. Using `binwalk -e` option, LZMA compressed file can be extracted. However, it will require some dependencies and one of which is [`sasquatch`](https://github.com/devttys0/sasquatch). Here's the [guide](https://www.linkedin.com/pulse/building-sasquatch-ubuntu-2404-daniel-darby-6ebie/) to build and install `sasquatch` on Ubuntu.
 
 First, let's extract the *dumped binary file*.
@@ -309,11 +308,11 @@ It includes the following files, and we can use `binwalk` on each uncompressed f
 Let's use `diff -qr` to compare the two `squashfs-root` directories and check if they are identical or not. If there's **no output**, the directories are **identical**. In my case, they are exactly the same. 
 
 # Getting Root Access
----
+
 Using the information from `/etc/passwd` and  `/etc/shadow` in the squashfs root filesystem, we can retrieve the username and password to log in as root. 
 
 ## Cracking the Hash
----
+
 The hash passwords can be cracked using tools like [hashcat](https://hashcat.net/hashcat/) or [John the Ripper](https://www.openwall.com/john/). 
 I used [John the Ripper](https://www.openwall.com/john/) tool. Also, I had already found the router's password on the internet, but I wanted to verify it against the hash. To speed up the cracking process, I added the possible password `5up` to the `/usr/share/john/password.lst` wordlist.
 
@@ -340,15 +339,15 @@ root:5up:0:0:root:/root:/bin/sh
 We can login to the router using the username `root` and password `5up`.
 
 # Further Firmware Analysis
----
+
 After gaining root access, we can now explore the contents of the Flash memory. 
 
 ## Transferring Flash memory contents over TFTP
----
+
 To analyze the firmware stored in Flash memory, we can transfer the files to a Linux host using TFTP. 
 
 ### Connect the devices
----
+
 * used an Ethernet connection between the host and the router for this transfer.
 * **Set static IPs** on both devices in the same subnet.
 
@@ -363,7 +362,7 @@ ifconfig eth0 192.168.0.200 netmask 255.255.255.0 up
 ```
 
 ### Setting up TFTP server on the host
----
+
 Install TFTP server on Linux machine.
 ```
 sudo apt install tftpd-hpa -y
@@ -391,7 +390,7 @@ sudo systemctl status tftpd-hpa
 ```
 
 ### Transfer Files using TFTP
----
+
 Check the partitions of Flash memory
 ```
 # cat /proc/mtd
@@ -427,7 +426,7 @@ art.img  config.img  kernel.img  rootfs.img  uboot.img
 ```
 
 ## Analyze the Firmware
----
+
 Before that we've explored the kernel and root filesystem, let's take a look at something we haven't examined yet: the `uboot.img`, `config.img`, `art.img`
 
 Using `binwalk`, `hexdump` to display the contents in hex, and `strings` command to print string data, we can analyze each image.
@@ -441,11 +440,11 @@ strings uboot.img
 ```
 
 # Emulating the Firmware
----
+
 to-do-list
 
 # References
----
+
 **Websites:**
 * [hacking-gemtek](https://github.com/digiampietro/hacking-gemtek)
 * [OpenWrt TP-Link TL-MR3020](https://openwrt.org/toh/tp-link/tl-mr3020#tp-link_tl-mr3020)
