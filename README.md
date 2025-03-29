@@ -28,7 +28,6 @@ Interesting Hardware Specifications:
 | ![TL-MR3020 pcb top](./images/TL-MR3020%20pcb-top.png) | ![TL-MR3020 pcb bottom](./images/TL-MR3020%20bottom.png) |
 
 ### Opening the case
----
 
 [This guide from OpenWrt website](https://openwrt.org/toh/tp-link/tl-mr3020) provided a more detailed instructions on how to open the case and better internal images than mine. In my case, a set of small and thin chisel tools like below is used to slowly lift the lid starting right above the ethernet port where the case is not glued.  
 **!!! Be careful not to scratch the PCB traces and ports. 
@@ -37,7 +36,6 @@ Interesting Hardware Specifications:
 ![TL-MR3020 uncovered](./images/TL-MR3020%20uncovered.png)
 
 ### Finding UART Interface
----
 
 UART (Universal Asynchronous Receiver/Transmitter), is a serial communication protocol used for transmitting data between two devices. It is very common in embedded devices and only uses two wires (TX and RX) with common a ground between transmitter and receiver to transmit and receive in both directions.
 
@@ -59,6 +57,7 @@ A multimeter measures the average voltage over a few hundred milliseconds. Durin
 | 2    | 5.32 kΩ | 6.23 kΩ | 2.6 V (constant)   | RX    |
 | 3    | **0 Ω** | 1.98 kΩ | **0 V**            | GND   |
 | 4    | 1.97 kΩ | **0 Ω** | **3.3 V**          | VCC   |
+
 Based on the above measurements, we can assume that 4 pin connector is the UART interface and the pinout is: **pin 1 (TX), pin 2 (RX), pin 3 (GND), pin 4 (VCC)**.
 
 UART interface allows us to:
@@ -216,7 +215,6 @@ In the next step, we will test some U-Boot commands and try to extract the firmw
 One way to extract the firmware and retrieve the root filesystem is through memory dumping. Alternatively, if available, the firmware can be downloaded directly from the vendor's website. 
 
 ### Method-1: Memory dumping 
----
 
 With the list of available U-Boot commands, it is not possible to access the contents of the Flash memory. However, using [`md`](https://docs.u-boot.org/en/latest/usage/cmd/md.html) command, we can display the contents on **DRAM**. 
 
@@ -268,7 +266,6 @@ binwalk dump.bin
 Apparently, the binary file contains a kernel image and a squashfs root filesystem compressed in LZMA format.
 
 ### Method-2: Downloading the Firmware
----
 
 Since TP-Link provided with [firmware updates](https://www.tp-link.com/us/support/download/tl-mr3020/#Firmware) on the website, we can easily download the file and analyze it using `binwalk`. 
 
