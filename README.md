@@ -28,6 +28,7 @@ Interesting Hardware Specifications:
 | ![TL-MR3020 pcb top](./images/TL-MR3020%20pcb-top.png) | ![TL-MR3020 pcb bottom](./images/TL-MR3020%20bottom.png) |
 
 ### Opening the case
+---
 
 [This guide from OpenWrt website](https://openwrt.org/toh/tp-link/tl-mr3020) provided a more detailed instructions on how to open the case and better internal images than mine. In my case, a set of small and thin chisel tools like below is used to slowly lift the lid starting right above the ethernet port where the case is not glued.  
 **!!! Be careful not to scratch the PCB traces and ports. 
@@ -36,6 +37,7 @@ Interesting Hardware Specifications:
 ![TL-MR3020 uncovered](./images/TL-MR3020%20uncovered.png)
 
 ### Finding UART Interface
+---
 
 UART (Universal Asynchronous Receiver/Transmitter), is a serial communication protocol used for transmitting data between two devices. It is very common in embedded devices and only uses two wires (TX and RX) with common a ground between transmitter and receiver to transmit and receive in both directions.
 
@@ -214,6 +216,7 @@ In the next step, we will test some U-Boot commands and try to extract the firmw
 One way to extract the firmware and retrieve the root filesystem is through memory dumping. Alternatively, if available, the firmware can be downloaded directly from the vendor's website. 
 
 ### Method-1: Memory dumping 
+---
 
 With the list of available U-Boot commands, it is not possible to access the contents of the Flash memory. However, using [`md`](https://docs.u-boot.org/en/latest/usage/cmd/md.html) command, we can display the contents on **DRAM**. 
 
@@ -265,6 +268,7 @@ binwalk dump.bin
 Apparently, the binary file contains a kernel image and a squashfs root filesystem compressed in LZMA format.
 
 ### Method-2: Downloading the Firmware
+---
 
 Since TP-Link provided with [firmware updates](https://www.tp-link.com/us/support/download/tl-mr3020/#Firmware) on the website, we can easily download the file and analyze it using `binwalk`. 
 
@@ -347,6 +351,7 @@ After gaining root access, we can now explore the contents of the Flash memory.
 To analyze the firmware stored in Flash memory, we can transfer the files to a Linux host using TFTP. 
 
 ### Connect the devices
+---
 
 * used an Ethernet connection between the host and the router for this transfer.
 * **Set static IPs** on both devices in the same subnet.
@@ -362,6 +367,7 @@ ifconfig eth0 192.168.0.200 netmask 255.255.255.0 up
 ```
 
 ### Setting up TFTP server on the host
+---
 
 Install TFTP server on Linux machine.
 ```
@@ -390,6 +396,7 @@ sudo systemctl status tftpd-hpa
 ```
 
 ### Transfer Files using TFTP
+---
 
 Check the partitions of Flash memory
 ```
