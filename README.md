@@ -363,7 +363,6 @@ ifconfig eth0 192.168.0.200 netmask 255.255.255.0 up
 ```
 
 ### Setting up TFTP server on the host
----
 
 Install TFTP server on Linux machine.
 ```
