@@ -348,7 +348,6 @@ After gaining root access, we can now explore the contents of the Flash memory.
 To analyze the firmware stored in Flash memory, we can transfer the files to a Linux host using TFTP. 
 
 ### Connect the devices
----
 
 * used an Ethernet connection between the host and the router for this transfer.
 * **Set static IPs** on both devices in the same subnet.
@@ -393,7 +392,6 @@ sudo systemctl status tftpd-hpa
 ```
 
 ### Transfer Files using TFTP
----
 
 Check the partitions of Flash memory
 ```
