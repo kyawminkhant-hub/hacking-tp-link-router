@@ -315,7 +315,7 @@ Using the information from `/etc/passwd` and  `/etc/shadow` in the squashfs root
 ## Cracking the Hash
 
 The hash passwords can be cracked using tools like [hashcat](https://hashcat.net/hashcat/) or [John the Ripper](https://www.openwall.com/john/). 
-I used [John the Ripper](https://www.openwall.com/john/) tool. Also, I had already found the router's password on the internet, but I wanted to verify it against the hash. To speed up the cracking process, I added the possible password `5up` to the `/usr/share/john/password.lst` wordlist.
+I used [John the Ripper](https://www.openwall.com/john/) tool. Also, I had already found the router's password on the internet, but I still wanted to verify it against the hash. To speed up the cracking process, I added the possible password `5up` to the `/usr/share/john/password.lst` wordlist.
 
 From [this example](https://www.openwall.com/john/doc/EXAMPLES.shtml), to get a copy of our Unix password file, we can use John's `unshadow` utility.
 
