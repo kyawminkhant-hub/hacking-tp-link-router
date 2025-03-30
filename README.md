@@ -216,7 +216,7 @@ One way to extract the firmware and retrieve the root filesystem is through memo
 
 ### Method-1: Memory dumping 
 
-With the list of available U-Boot commands, it is not possible to access the contents of the Flash memory. However, using [`md`](https://docs.u-boot.org/en/latest/usage/cmd/md.html) command, we can only display the contents on **DRAM**. 
+With the list of available U-Boot commands, it is not possible to access the contents of the Flash memory. However, using [`md`](https://docs.u-boot.org/en/latest/usage/cmd/md.html) command, we can display the contents on **DRAM**. 
 
 From the above boot info, kernel image is booted at the address `0x9f020000`. Since a SquashFS root filesystem is used, it is also possible for the root filesystem to be loaded into **DRAM**.
 
