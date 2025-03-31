@@ -34,7 +34,7 @@ Interesting Hardware Specifications:
 (just because I also scratched the USB and Ethernet ports)**
 
 ![TL-MR3020 uncovered](./images/TL-MR3020%20uncovered.png)
-<img src="./images/Chisel.jpg" width=500 height=auto>
+<img src="./images/Chisel.jpg" width=300 height=auto>
 
 ### Finding UART Interface
 
